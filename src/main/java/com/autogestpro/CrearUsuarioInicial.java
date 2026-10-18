@@ -12,14 +12,24 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Scanner;
 
+/**
+ * Utilidad de consola que crea el primer usuario de AutoGest Pro.
+ * Solo funciona si la tabla usuarios está vacía y guarda la contraseña como hash BCrypt.
+ *
+ * Ejecución: mvn exec:java -Dexec.mainClass=com.autogestpro.CrearUsuarioInicial
+ */
 public class CrearUsuarioInicial {
 
+    /** Pide nombre de usuario y contraseña por consola y registra el usuario inicial. */
     public static void main(String[] args) {
+        // Console oculta la contraseña al escribirla. Si no está disponible
+        // (por ejemplo, en algunos IDE) se usa Scanner y la contraseña se verá en pantalla.
         Console consola = System.console();
         Scanner teclado = consola == null ? new Scanner(System.in) : null;
 
         try (Connection conexion = DatabaseConnection.getConnection()) {
 
+            // Solo se permite crear el usuario inicial cuando la tabla usuarios está vacía.
             try (PreparedStatement consulta = conexion.prepareStatement(
                     "SELECT COUNT(*) FROM usuarios");
                  ResultSet resultado = consulta.executeQuery()) {
@@ -60,6 +70,7 @@ public class CrearUsuarioInicial {
                     return;
                 }
 
+                // Se guarda únicamente el hash BCrypt (costo 12), nunca la contraseña.
                 String hash = BCrypt.hashpw(
                         new String(clave), BCrypt.gensalt(12));
 
@@ -82,6 +93,7 @@ public class CrearUsuarioInicial {
                         "Guarda el nombre de usuario y la contraseña.");
 
             } finally {
+                // Se borran las contraseñas de la memoria en cuanto dejan de usarse.
                 Arrays.fill(clave, '\0');
                 Arrays.fill(confirmacion, '\0');
             }
@@ -96,6 +108,7 @@ public class CrearUsuarioInicial {
         }
     }
 
+    /** Lee una línea de texto desde la consola o, si no hay consola, desde el teclado. */
     private static String leerTexto(
             Console consola, Scanner teclado) {
         return consola != null
@@ -103,6 +116,7 @@ public class CrearUsuarioInicial {
                 : teclado.nextLine();
     }
 
+    /** Lee una contraseña como arreglo de caracteres (se puede borrar de memoria después). */
     private static char[] leerClave(
             Console consola, Scanner teclado, String mensaje) {
         if (consola != null) {

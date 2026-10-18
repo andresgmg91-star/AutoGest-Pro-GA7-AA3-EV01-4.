@@ -1,121 +1,56 @@
 # AutoGest Pro — Módulo de gestión de clientes
 
-**Evidencia:** GA7-220501096-AA2-EV01 — Codificación de módulos del software  
-**Aprendiz:** Andrés Mantilla  
-**Tecnologías:** Java 17, JDBC, MariaDB/MySQL, Maven y Git.
+**Evidencia:** GA7-220501096-AA3-EV01 — Codificación de módulos del software stand-alone, web y móvil
+**Aprendiz:** Andrés Mantilla · SENA, Tecnólogo en Análisis y Desarrollo de Software (ficha 3186601)
+**Tecnologías:** Java 17, Spring Boot 3 (framework web) con Thymeleaf, JDBC, MariaDB/MySQL, Maven, JUnit 5 y Git.
 
-## 1. ¿Qué contiene?
+## Qué hace el módulo
 
-Este proyecto implementa el módulo de clientes de AutoGest Pro. Permite:
+Administra los clientes de un taller de mantenimiento vehicular: registrar, consultar, buscar por número de documento, actualizar y eliminar. Se puede usar de tres maneras que comparten el mismo acceso a datos (`ClienteDAO`):
 
-- **Insertar:** registrar nuevos clientes.
-- **Consultar:** listar los clientes guardados.
-- **Buscar:** localizar un cliente por su número de documento.
-- **Actualizar:** modificar el registro seleccionado.
-- **Eliminar:** borrar un registro, previa confirmación.
+- **Aplicación de escritorio** (Swing): inicio de sesión y ventana de gestión de clientes.
+- **Aplicación web** (Spring Boot + Thymeleaf): login, dashboard y listado/registro de clientes.
+- **API REST** (JSON) en `/api/clientes`: consultar, buscar, registrar, actualizar y eliminar.
 
-Se utiliza una interfaz gráfica sencilla de escritorio con Swing. Las consultas SQL se encuentran en `ClienteDAO`, los datos se representan mediante la clase `Cliente` y la conexión se administra en `DatabaseConnection`.
+El inicio de sesión valida usuarios guardados en la tabla `usuarios`, con contraseñas protegidas con BCrypt.
 
-## 2. Requisitos
+## Requisitos
 
-- JDK 17 o superior.
-- Maven 3.8 o superior.
-- Un servidor MariaDB o MySQL en funcionamiento.
-- Git, para el control de versiones.
+JDK 17, Maven 3.8 o superior, MariaDB/MySQL en ejecución (por ejemplo, con XAMPP) y Git.
 
-La dependencia JDBC se descarga desde Maven al construir el proyecto. El archivo `pom.xml` declara MariaDB Connector/J 3.5.10, que utiliza la API JDBC y permite conectarse a servidores MariaDB y MySQL.
+## Puesta en marcha
 
-## 3. Preparar la base de datos
+1. Inicie MySQL/MariaDB e importe `database/autogest_pro.sql` (crea la base `autogest_pro` y las tablas `clientes` y `usuarios`).
+2. Si su servidor no usa `root` sin contraseña, copie `src/main/resources/db.properties.example` como `src/main/resources/db.properties` y ajuste los datos (este archivo no se sube a Git). También sirven las variables de entorno `AUTOGEST_DB_URL`, `AUTOGEST_DB_USER` y `AUTOGEST_DB_PASSWORD`.
+3. Cree el primer usuario: `mvn exec:java -Dexec.mainClass=com.autogestpro.CrearUsuarioInicial`
+4. Ejecute la versión que desee:
+   - Escritorio: `mvn exec:java`
+   - Web: `mvn spring-boot:run` y abra `http://localhost:8080`
+5. Pruebas unitarias (requieren la base de datos activa): `mvn test`
 
-1. Inicie MySQL/MariaDB. Si usa XAMPP, abra el panel de control e inicie el servicio de base de datos.
-2. Abra phpMyAdmin o su administrador de base de datos.
-3. Importe el archivo `database/autogest_pro.sql`.
-4. Confirme que se crearon la base `autogest_pro` y la tabla `clientes`.
-
-El script utiliza `CREATE DATABASE IF NOT EXISTS` y `CREATE TABLE IF NOT EXISTS`; no elimina las tablas existentes.
-
-## 4. Configurar la conexión
-
-La configuración predeterminada es para un entorno **local de práctica**:
-
-- URL: `jdbc:mariadb://localhost:3306/autogest_pro`
-- Usuario: `root`
-- Contraseña: vacía
-
-Esto puede coincidir con una instalación local de XAMPP sin contraseña, pero no es una configuración universal. Si su instalación utiliza otros datos, copie `src/main/resources/db.properties.example` como `src/main/resources/db.properties` y edite la URL, el usuario y la contraseña. El archivo real `db.properties` está excluido de Git para no publicar credenciales.
-
-También se pueden definir estas variables de entorno, que tienen prioridad sobre el archivo:
-
-- `AUTOGEST_DB_URL`
-- `AUTOGEST_DB_USER`
-- `AUTOGEST_DB_PASSWORD`
-
-No use la cuenta `root` ni una contraseña vacía en un servidor productivo.
-
-## 5. Ejecutar desde la terminal
-
-Abra una terminal en la carpeta que contiene `pom.xml` y ejecute:
-
-```bash
-mvn clean compile
-mvn exec:java
-```
-
-La primera ejecución necesita conexión a internet para que Maven descargue la dependencia JDBC. También se puede importar la carpeta como **proyecto Maven** en Visual Studio Code o en un IDE compatible con Java.
-
-## 6. Probar las operaciones
-
-1. Pulse **Consultar todos** para ver los registros.
-2. Registre un cliente con tipo y número de documento, nombres y apellidos. Pulse **Guardar cliente**.
-3. Escriba un número de documento y pulse **Buscar por documento**.
-4. Seleccione una fila de la tabla, cambie un dato y pulse **Actualizar seleccionado**.
-5. Seleccione una fila y pulse **Eliminar seleccionado**. Confirme la eliminación.
-6. Vuelva a consultar para verificar el resultado.
-
-La base de datos impide duplicar la combinación de tipo y número de documento. Los valores enviados a SQL se parametrizan con `PreparedStatement`.
-
-## 7. Estructura del proyecto
+## Estructura
 
 ```text
-ANDRESMANTILLA_AA2_EV01/
-├── database/
-│   └── autogest_pro.sql
-├── docs/
-│   ├── DOCUMENTACION_MODULO.md
-│   └── GUIA_EVIDENCIAS.md
+├── database/autogest_pro.sql          Script de la base de datos
+├── docs/DOCUMENTACION_MODULO.md       Documentación técnica del módulo
 ├── src/main/java/com/autogestpro/
-│   ├── Main.java
-│   ├── config/DatabaseConnection.java
-│   ├── dao/ClienteDAO.java
-│   ├── model/Cliente.java
-│   └── ui/VentanaClientes.java
-├── src/main/resources/db.properties.example
-├── .gitignore
-├── pom.xml
-├── ENLACE_REPOSITORIO.txt
-└── README.md
+│   ├── Main.java                      Entrada de la versión de escritorio
+│   ├── CrearUsuarioInicial.java       Utilidad para crear el primer usuario
+│   ├── config/DatabaseConnection.java Conexión JDBC
+│   ├── model/Cliente.java             Clase del modelo
+│   ├── dao/ClienteDAO.java            Consultas SQL de clientes
+│   ├── dao/UsuarioDAO.java            Validación de usuarios
+│   ├── ui/                            Ventanas Swing (login y clientes)
+│   └── web/                           Controladores Spring (web y API REST)
+├── src/main/resources/                Plantillas y páginas HTML, db.properties.example
+├── src/test/java/                     Pruebas JUnit 5
+└── pom.xml
 ```
 
-## 8. Control de versiones con Git
+## Estándares de codificación
 
-Si la carpeta ya tiene un repositorio Git, abra la terminal en esta carpeta y revise `git status`. Para crear el repositorio local si todavía no existe:
+Nombres de clases en PascalCase, métodos y variables en camelCase, paquetes en minúscula y constantes en mayúsculas. Todo el código está comentado con Javadoc y comentarios explicativos. Las consultas SQL usan `PreparedStatement` con try-with-resources, las contraseñas se guardan con BCrypt y las rutas web exigen sesión iniciada.
 
-```bash
-git init
-git add .
-git commit -m "Primera versión del módulo de clientes de AutoGest Pro"
-```
+## Control de versiones
 
-Después cree un repositorio vacío en su cuenta de GitHub. Copie su URL y ejecute los comandos sustituyendo la dirección de ejemplo:
-
-```bash
-git branch -M main
-git remote add origin https://github.com/USUARIO/AutoGest-Pro-GA7-AA2-EV01.git
-git push -u origin main
-```
-
-Si `origin` ya existe, no repita `git remote add origin`; use `git remote set-url origin URL_DEL_REPOSITORIO` si debe corregirlo. Al publicar el proyecto, copie la URL real en `ENLACE_REPOSITORIO.txt` y vuelva a incluir ese archivo en la entrega ZIP.
-
-## 9. Alcance y compatibilidad
-
-Este paquete desarrolla un módulo Java con JDBC porque la consigna de esta evidencia menciona expresamente JDBC. Si la versión principal de AutoGest Pro se mantiene en PHP, esta implementación debe presentarse como el módulo Java solicitado para la evidencia, no como código PHP que pueda ejecutar JDBC directamente.
+El proyecto se versiona con Git y se publica en GitHub; el enlace está en `ENLACE_REPOSITORIO.txt`.

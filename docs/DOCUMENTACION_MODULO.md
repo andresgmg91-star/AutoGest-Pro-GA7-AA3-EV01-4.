@@ -30,3 +30,13 @@ Se aplican nombres de clases en PascalCase (`ClienteDAO`), paquetes en minúscul
 ## Consideraciones
 
 La conexión predeterminada corresponde a un entorno local de aprendizaje. Antes de usar el sistema en producción, se debe crear un usuario exclusivo de base de datos con permisos limitados, configurar una contraseña segura, hacer pruebas y definir copias de seguridad.
+
+## Capa web (Spring Boot)
+
+- **`web/AutoGestWebApplication.java`:** punto de entrada de la versión web.
+- **`web/LoginWebController.java`:** inicio y cierre de sesión y panel principal; guarda el usuario en la sesión.
+- **`web/ClienteWebController.java`:** pantallas de clientes con plantillas Thymeleaf; exige sesión iniciada.
+- **`web/ClienteApiController.java`:** API REST en `/api/clientes` (GET, POST, PUT y DELETE) con respuestas HTTP según el resultado.
+- **`dao/UsuarioDAO.java`:** valida usuario y contraseña comparando contra el hash BCrypt de la tabla `usuarios`.
+
+Las tres formas de uso (escritorio, web y API) comparten `ClienteDAO`, de modo que las reglas de acceso a datos están en un solo lugar.

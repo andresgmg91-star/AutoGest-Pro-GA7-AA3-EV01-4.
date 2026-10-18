@@ -16,19 +16,26 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import javax.imageio.ImageIO;
 
+/**
+ * Ventana de inicio de sesión de la versión de escritorio.
+ * Valida las credenciales con UsuarioDAO y, si son correctas, abre VentanaClientes.
+ */
 public class VentanaLogin extends JFrame {
 
+    // Componentes del formulario de acceso.
     private final JTextField campoUsuario;
     private final JPasswordField campoClave;
     private final JButton botonIngresar;
     private final JLabel etiquetaMensaje;
 
+    // Colores de la ventana de acceso.
     private static final Color VERDE = new Color(35, 125, 78);
     private static final Color VERDE_OSCURO = new Color(25, 92, 58);
     private static final Color TEXTO = new Color(39, 49, 44);
     private static final Color GRIS = new Color(112, 122, 116);
     private static final Color FONDO = new Color(247, 249, 247);
 
+    /** Construye la ventana con dos paneles: imagen a la izquierda y formulario a la derecha. */
     public VentanaLogin() {
         setTitle("AutoGest Pro | Iniciar sesión");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -196,6 +203,7 @@ public class VentanaLogin extends JFrame {
         getRootPane().setDefaultButton(botonIngresar);
     }
 
+    /** Crea una etiqueta de texto con el estilo del formulario. */
     private JLabel crearEtiqueta(String texto) {
         JLabel etiqueta = new JLabel(texto);
         etiqueta.setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -204,6 +212,7 @@ public class VentanaLogin extends JFrame {
         return etiqueta;
     }
 
+    /** Crea un campo de texto con estilo y un texto de ayuda (tooltip). */
     private JTextField crearCampo(String ayuda) {
         JTextField campo = new JTextField();
         estilizarCampo(campo);
@@ -211,6 +220,7 @@ public class VentanaLogin extends JFrame {
         return campo;
     }
 
+    /** Aplica fuente, colores y borde redondeado a un campo de texto. */
     private void estilizarCampo(JTextField campo) {
         campo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         campo.setForeground(TEXTO);
@@ -225,6 +235,10 @@ public class VentanaLogin extends JFrame {
         campo.setAlignmentX(Component.LEFT_ALIGNMENT);
     }
 
+    /**
+     * Valida los datos escritos y consulta el acceso en la base de datos.
+     * Si las credenciales son correctas abre la ventana de clientes; si no, muestra el mensaje de error.
+     */
     private void iniciarSesion() {
         String usuario = campoUsuario.getText().trim();
         char[] clave = campoClave.getPassword();
@@ -236,6 +250,7 @@ public class VentanaLogin extends JFrame {
             return;
         }
 
+        // Se deshabilita el botón mientras se verifica, para evitar envíos repetidos.
         botonIngresar.setEnabled(false);
         etiquetaMensaje.setForeground(GRIS);
         etiquetaMensaje.setText("Verificando acceso...");
@@ -243,6 +258,7 @@ public class VentanaLogin extends JFrame {
         try {
             UsuarioDAO usuarioDAO = new UsuarioDAO();
 
+            // Credenciales correctas: se cierra el login y se abre la ventana de clientes.
             if (usuarioDAO.autenticar(usuario, clave)) {
                 dispose();
                 SwingUtilities.invokeLater(
@@ -268,11 +284,13 @@ public class VentanaLogin extends JFrame {
                     "Error de conexión",
                     JOptionPane.ERROR_MESSAGE);
         } finally {
+            // Se borra la contraseña de la memoria y se reactiva el botón.
             Arrays.fill(clave, '\0');
             botonIngresar.setEnabled(true);
         }
     }
 
+    /** Borde con esquinas redondeadas para los campos de texto. */
     private static class BordeRedondeado extends AbstractBorder {
         private final Color color;
         private final int radio;
@@ -303,6 +321,7 @@ public class VentanaLogin extends JFrame {
         }
     }
 
+    /** Panel que muestra la fotografía del taller (o una decoración si no hay imagen). */
     private static class PanelFotografia extends JPanel {
         private BufferedImage imagen;
 

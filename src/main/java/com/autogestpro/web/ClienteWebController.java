@@ -13,13 +13,24 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.sql.SQLException;
 
+/**
+ * Controlador web (MVC) de las pantallas de clientes con plantillas Thymeleaf.
+ * Todas las rutas exigen haber iniciado sesión.
+ */
 @Controller
 public class ClienteWebController {
 
+    // Mismo DAO que usa la versión de escritorio: la lógica de datos no se duplica.
     private final ClienteDAO clienteDAO = new ClienteDAO();
 
+    /**
+     * Muestra la página con la lista de clientes (GET /clientes).
+     *
+     * @return nombre de la plantilla "clientes", o redirección al login si no hay sesión
+     */
     @GetMapping("/clientes")
     public String mostrarClientes(HttpSession sesion, Model modelo) {
+        // Ruta protegida: sin sesión iniciada se envía al login.
         if (sesion.getAttribute("usuario") == null) {
             return "redirect:/login.html";
         }
@@ -37,6 +48,10 @@ public class ClienteWebController {
         }
     }
 
+    /**
+     * Recibe el formulario y registra un cliente nuevo (POST /clientes/guardar).
+     * Después redirige a la lista con un mensaje de éxito o de error.
+     */
     @PostMapping("/clientes/guardar")
     public String guardarCliente(
             @RequestParam String tipoDocumento,
@@ -49,11 +64,14 @@ public class ClienteWebController {
             HttpSession sesion,
             RedirectAttributes atributos) {
 
+        // Ruta protegida: sin sesión iniciada se envía al login.
         if (sesion.getAttribute("usuario") == null) {
             return "redirect:/login.html";
         }
 
         try {
+            // El id va en 0 porque lo genera la base de datos al insertar.
+            // trim() elimina espacios sobrantes al inicio y al final de cada dato.
             Cliente cliente = new Cliente(
                     0,
                     tipoDocumento,

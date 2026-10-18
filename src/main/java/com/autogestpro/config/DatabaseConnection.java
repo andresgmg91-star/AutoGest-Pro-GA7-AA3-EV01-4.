@@ -9,6 +9,8 @@ import java.util.Properties;
 
 /** Administra las conexiones JDBC de AutoGest Pro. */
 public final class DatabaseConnection {
+    // Valores por defecto pensados para un XAMPP local de práctica.
+    // Se pueden reemplazar con db.properties o con variables de entorno.
     private static final String URL_PREDETERMINADA =
             "jdbc:mariadb://localhost:3306/autogest_pro";
     private static final String USUARIO_PREDETERMINADO = "root";
@@ -18,6 +20,14 @@ public final class DatabaseConnection {
         // Evita crear instancias de una clase de utilidad.
     }
 
+    /**
+     * Abre una conexión JDBC nueva con la base de datos.
+     * Los datos de conexión se toman, en este orden de prioridad, de las
+     * variables de entorno, del archivo db.properties y de los valores por defecto.
+     *
+     * @return conexión abierta (quien la usa debe cerrarla, por ejemplo con try-with-resources)
+     * @throws SQLException si no se puede conectar con el servidor
+     */
     public static Connection getConnection() throws SQLException {
         Properties properties = cargarPropiedades();
 
@@ -31,6 +41,10 @@ public final class DatabaseConnection {
         return DriverManager.getConnection(url, usuario, clave);
     }
 
+    /**
+     * Lee db.properties desde el classpath. Si el archivo no existe
+     * devuelve propiedades vacías y se usan los valores por defecto.
+     */
     private static Properties cargarPropiedades() {
         Properties properties = new Properties();
         try (InputStream input = DatabaseConnection.class
@@ -45,6 +59,10 @@ public final class DatabaseConnection {
         return properties;
     }
 
+    /**
+     * Devuelve el valor de un parámetro: primero la variable de entorno,
+     * luego la propiedad del archivo y, por último, el valor por defecto.
+     */
     private static String valorConfiguracion(
             String variableEntorno,
             String propiedad,

@@ -11,10 +11,16 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * API REST de clientes (JSON) en la ruta /api/clientes.
+ * Ofrece las operaciones CRUD: consultar, buscar por documento, registrar,
+ * actualizar y eliminar. Responde con códigos HTTP (200, 201, 400, 404, 409, 500).
+ */
 @RestController
 @RequestMapping("/api/clientes")
 public class ClienteApiController {
 
+    // DAO compartido con la versión de escritorio y con el controlador web.
     private final ClienteDAO clienteDAO = new ClienteDAO();
 
     // 1. Consultar todos los clientes
@@ -152,6 +158,7 @@ public class ClienteApiController {
         }
     }
 
+    /** Comprueba que vengan los datos obligatorios: tipo y número de documento, nombres y apellidos. */
     private boolean datosObligatoriosValidos(Cliente cliente) {
         return cliente != null
                 && noVacio(cliente.getTipoDocumento())
@@ -160,10 +167,12 @@ public class ClienteApiController {
                 && noVacio(cliente.getApellidos());
     }
 
+    /** Devuelve true si el texto no es nulo ni está en blanco. */
     private boolean noVacio(String texto) {
         return texto != null && !texto.trim().isEmpty();
     }
 
+    /** Quita los espacios sobrantes de los datos antes de guardarlos. */
     private void limpiarDatos(Cliente cliente) {
         cliente.setTipoDocumento(cliente.getTipoDocumento().trim());
         cliente.setNumeroDocumento(cliente.getNumeroDocumento().trim());
@@ -174,10 +183,16 @@ public class ClienteApiController {
         cliente.setDireccion(limpiarTexto(cliente.getDireccion()));
     }
 
+    /** Quita espacios del texto; si es nulo devuelve una cadena vacía. */
     private String limpiarTexto(String texto) {
         return texto == null ? "" : texto.trim();
     }
 
+    /**
+     * Traduce un error de base de datos a una respuesta HTTP:
+     * 409 (conflicto) si viola una restricción, como un documento repetido,
+     * o 500 en cualquier otro caso. No se expone el detalle técnico al usuario.
+     */
     private ResponseEntity<?> errorBaseDatos(SQLException e) {
         String estado = e.getSQLState();
 

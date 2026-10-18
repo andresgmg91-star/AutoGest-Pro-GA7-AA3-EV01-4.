@@ -12,6 +12,11 @@ import java.sql.SQLException;
 /** Punto de entrada de AutoGest Pro. */
 public class Main {
 
+    /**
+     * Arranca la versión de escritorio: comprueba la conexión con la base de datos
+     * y, si responde, muestra la ventana de inicio de sesión.
+     * (La versión web se inicia desde AutoGestWebApplication.)
+     */
     public static void main(String[] args) {
         try (Connection ignored = DatabaseConnection.getConnection()) {
             // Comprueba la conexión antes de mostrar el inicio de sesión.

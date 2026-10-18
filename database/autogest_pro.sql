@@ -22,3 +22,18 @@ CREATE TABLE IF NOT EXISTS clientes (
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci;
+
+-- Usuarios que pueden iniciar sesión (escritorio y web).
+-- La contraseña se guarda como hash BCrypt en clave_hash, nunca en texto plano.
+-- El primer usuario se crea con: mvn exec:java -Dexec.mainClass=com.autogestpro.CrearUsuarioInicial
+CREATE TABLE IF NOT EXISTS usuarios (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    nombre_usuario VARCHAR(50) NOT NULL,
+    clave_hash VARCHAR(100) NOT NULL,
+    activo TINYINT(1) NOT NULL DEFAULT 1,
+    fecha_registro TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT uq_usuarios_nombre UNIQUE (nombre_usuario)
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;

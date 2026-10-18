@@ -1,8 +1,10 @@
-EVIDENCIA GA7-220501096-AA2-EV01  
-Proyecto: AutoGest Pro  
+EVIDENCIA GA7-220501096-AA3-EV01
+Codificación de módulos del software stand-alone, web y móvil
+Proyecto: AutoGest Pro
 Aprendiz: Andrés Mantilla
 
 Enlace del repositorio de GitHub:
 https://github.com/andresgmg91-star/AutoGest-Pro-GA7-AA2-EV01-Copiar
 
-El repositorio contiene los archivos fuente del módulo de gestión de clientes, la conexión a la base de datos mediante JDBC, el script SQL y la documentación del proyecto.
+El repositorio contiene el código fuente del módulo de gestión de clientes
+(versión de escritorio y versión web con Spring Boot), el script SQL y la documentación.

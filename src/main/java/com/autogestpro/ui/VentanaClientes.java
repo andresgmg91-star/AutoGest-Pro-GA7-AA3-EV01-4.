@@ -42,6 +42,7 @@ import java.util.List;
 
 /** Interfaz de escritorio moderna para administrar los clientes del taller. */
 public class VentanaClientes extends JFrame {
+    // Paleta de colores y tipografías de la interfaz.
     private static final Color NAVY = new Color(13, 32, 66);
     private static final Color BLUE = new Color(37, 99, 235);
     private static final Color BLUE_DARK = new Color(29, 78, 216);
@@ -57,8 +58,10 @@ public class VentanaClientes extends JFrame {
     private static final Font FONT = new Font("Segoe UI", Font.PLAIN, 13);
     private static final Font FONT_BOLD = new Font("Segoe UI", Font.BOLD, 13);
 
+    // DAO que ejecuta las operaciones SQL sobre la tabla clientes.
     private final ClienteDAO clienteDAO = new ClienteDAO();
 
+    // Controles del formulario de captura de datos.
     private final JComboBox<String> tipoDocumento = new JComboBox<>(new String[]{
             "Cédula de ciudadanía", "Cédula de extranjería", "NIT",
             "Pasaporte", "Permiso por Protección Temporal"
@@ -70,6 +73,8 @@ public class VentanaClientes extends JFrame {
     private final JTextField correo = new JTextField();
     private final JTextField direccion = new JTextField();
 
+    // Modelo de la tabla: las celdas no se editan directamente;
+    // los cambios se hacen desde el formulario.
     private final DefaultTableModel modeloTabla = new DefaultTableModel(
             new Object[]{"ID", "Tipo de documento", "Número", "Nombres", "Apellidos",
                     "Teléfono", "Correo electrónico", "Dirección"}, 0) {
@@ -81,8 +86,10 @@ public class VentanaClientes extends JFrame {
     private final JTable tablaClientes = new JTable(modeloTabla);
     private final JLabel contadorClientes = new JLabel("0 registros");
     private final JLabel estadoTabla = new JLabel("Listo para trabajar");
+    // Id del cliente seleccionado en la tabla (null si no hay selección).
     private Long clienteSeleccionadoId;
 
+    // Ajusta la apariencia de los cuadros de diálogo (JOptionPane).
     static {
         UIManager.put("OptionPane.messageFont", FONT);
         UIManager.put("OptionPane.buttonFont", FONT_BOLD);
@@ -90,12 +97,14 @@ public class VentanaClientes extends JFrame {
         UIManager.put("Panel.background", SURFACE);
     }
 
+    /** Crea la ventana, arma la interfaz y carga la lista de clientes. */
     public VentanaClientes() {
         super("AutoGest Pro | Gestión de clientes");
         crearInterfaz();
         consultarClientes();
     }
 
+    /** Organiza la ventana: encabezado, formulario, tabla y pie de página. */
     private void crearInterfaz() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(1000, 650));
@@ -134,6 +143,7 @@ public class VentanaClientes extends JFrame {
         configurarCampos();
     }
 
+    /** Construye la barra superior con la marca de AutoGest Pro. */
     private JPanel crearEncabezado() {
         GradientPanel encabezado = new GradientPanel(new Color(11, 29, 62), new Color(33, 91, 190));
         encabezado.setLayout(new BorderLayout(18, 0));
@@ -177,6 +187,7 @@ public class VentanaClientes extends JFrame {
         return encabezado;
     }
 
+    /** Construye el título y el subtítulo de la pantalla. */
     private JPanel crearTituloPagina() {
         JPanel panel = new JPanel(new BorderLayout(12, 0));
         panel.setOpaque(false);
@@ -205,6 +216,10 @@ public class VentanaClientes extends JFrame {
         return panel;
     }
 
+    /**
+     * Construye la tarjeta con el formulario de datos del cliente
+     * y los botones de acción (guardar, ver todos, buscar, actualizar, eliminar y limpiar).
+     */
     private JPanel crearTarjetaFormulario() {
         CardPanel tarjeta = new CardPanel();
         tarjeta.setLayout(new BorderLayout(0, 13));
@@ -280,6 +295,7 @@ public class VentanaClientes extends JFrame {
         return tarjeta;
     }
 
+    /** Ubica un campo con su etiqueta en la cuadrícula del formulario. */
     private void agregarCampo(JPanel panel, GridBagConstraints base, int columna, int fila, int ancho,
                               String etiqueta, java.awt.Component componente) {
         GridBagConstraints c = (GridBagConstraints) base.clone();
@@ -291,6 +307,7 @@ public class VentanaClientes extends JFrame {
         panel.add(crearCampo(etiqueta, componente), c);
     }
 
+    /** Agrupa una etiqueta y su campo de entrada en un mismo panel. */
     private JPanel crearCampo(String texto, java.awt.Component campo) {
         JPanel grupo = new JPanel(new BorderLayout(0, 6));
         grupo.setOpaque(false);
@@ -302,6 +319,7 @@ public class VentanaClientes extends JFrame {
         return grupo;
     }
 
+    /** Construye la tarjeta con la tabla de clientes registrados y su contador. */
     private JPanel crearTarjetaTabla() {
         CardPanel tarjeta = new CardPanel();
         tarjeta.setLayout(new BorderLayout(0, 12));
@@ -349,6 +367,7 @@ public class VentanaClientes extends JFrame {
         return tarjeta;
     }
 
+    /** Crea un botón con el estilo visual de la aplicación. */
     private JButton crearBoton(String texto, Color fondo, Color textoColor, Color hover) {
         StyledButton boton = new StyledButton(texto, fondo, hover);
         boton.setForeground(textoColor);
@@ -359,6 +378,7 @@ public class VentanaClientes extends JFrame {
         return boton;
     }
 
+    /** Aplica el estilo a los campos de texto y a la lista de tipo de documento. */
     private void configurarCampos() {
         configurarCampoTexto(numeroDocumento);
         configurarCampoTexto(nombres);
@@ -376,6 +396,7 @@ public class VentanaClientes extends JFrame {
         tipoDocumento.setFocusable(false);
     }
 
+    /** Aplica fuente, colores y borde a un campo de texto. */
     private void configurarCampoTexto(JTextField campo) {
         campo.setFont(FONT);
         campo.setForeground(TEXT);
@@ -387,6 +408,10 @@ public class VentanaClientes extends JFrame {
                 BorderFactory.createEmptyBorder(8, 10, 8, 10)));
     }
 
+    /**
+     * Configura la tabla: selección de una sola fila, orden por columnas,
+     * anchos de columna y escucha del evento de selección.
+     */
     private void configurarTabla() {
         tablaClientes.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         tablaClientes.setForeground(TEXT);
@@ -420,6 +445,10 @@ public class VentanaClientes extends JFrame {
         tablaClientes.getSelectionModel().addListSelectionListener(this::seleccionarFila);
     }
 
+    /**
+     * Al seleccionar una fila de la tabla, carga sus datos en el formulario
+     * y recuerda el id del cliente para poder actualizarlo o eliminarlo.
+     */
     private void seleccionarFila(ListSelectionEvent evento) {
         if (evento.getValueIsAdjusting()) {
             return;
@@ -441,11 +470,13 @@ public class VentanaClientes extends JFrame {
         estadoTabla.setText("Cliente seleccionado: " + textoCelda(filaModelo, 3) + " " + textoCelda(filaModelo, 4));
     }
 
+    /** Devuelve el texto de una celda del modelo (cadena vacía si es nulo). */
     private String textoCelda(int fila, int columna) {
         Object valor = modeloTabla.getValueAt(fila, columna);
         return valor == null ? "" : valor.toString();
     }
 
+    /** Valida el formulario, inserta el cliente y refresca la tabla. */
     private void guardarCliente() {
         if (!formularioValido()) {
             return;
@@ -461,6 +492,7 @@ public class VentanaClientes extends JFrame {
         }
     }
 
+    /** Consulta todos los clientes y los muestra en la tabla. */
     private void consultarClientes() {
         try {
             mostrarClientes(clienteDAO.consultarTodos());
@@ -469,6 +501,7 @@ public class VentanaClientes extends JFrame {
         }
     }
 
+    /** Busca por el número de documento escrito en el formulario. */
     private void buscarCliente() {
         String documento = numeroDocumento.getText().trim();
         if (documento.isEmpty()) {
@@ -489,6 +522,7 @@ public class VentanaClientes extends JFrame {
         }
     }
 
+    /** Actualiza el cliente seleccionado con los datos del formulario. */
     private void actualizarCliente() {
         if (clienteSeleccionadoId == null) {
             JOptionPane.showMessageDialog(this, "Seleccione primero un cliente de la tabla.",
@@ -514,6 +548,7 @@ public class VentanaClientes extends JFrame {
         }
     }
 
+    /** Elimina el cliente seleccionado, previa confirmación del usuario. */
     private void eliminarCliente() {
         if (clienteSeleccionadoId == null) {
             JOptionPane.showMessageDialog(this, "Seleccione primero un cliente de la tabla.",
@@ -542,6 +577,7 @@ public class VentanaClientes extends JFrame {
         }
     }
 
+    /** Toma los valores del formulario y los convierte en un objeto Cliente. */
     private Cliente leerCliente() {
         Cliente cliente = new Cliente();
         cliente.setTipoDocumento(String.valueOf(tipoDocumento.getSelectedItem()));
@@ -554,6 +590,10 @@ public class VentanaClientes extends JFrame {
         return cliente;
     }
 
+    /**
+     * Verifica que estén diligenciados los campos obligatorios:
+     * número de documento, nombres y apellidos.
+     */
     private boolean formularioValido() {
         if (numeroDocumento.getText().trim().isEmpty()
                 || nombres.getText().trim().isEmpty()
@@ -566,6 +606,7 @@ public class VentanaClientes extends JFrame {
         return true;
     }
 
+    /** Llena la tabla con la lista recibida y actualiza el contador de registros. */
     private void mostrarClientes(List<Cliente> clientes) {
         modeloTabla.setRowCount(0);
         clienteSeleccionadoId = null;
@@ -580,6 +621,7 @@ public class VentanaClientes extends JFrame {
         estadoTabla.setText("Consulta completada · " + clientes.size() + " registros visibles");
     }
 
+    /** Vacía el formulario y quita la selección de la tabla. */
     private void limpiarFormulario() {
         clienteSeleccionadoId = null;
         tablaClientes.clearSelection();
@@ -594,6 +636,7 @@ public class VentanaClientes extends JFrame {
         numeroDocumento.requestFocus();
     }
 
+    /** Muestra un mensaje de error con pistas para revisar la conexión a la base de datos. */
     private void mostrarError(String mensaje, SQLException exception) {
         JOptionPane.showMessageDialog(this,
                 mensaje + "\nRevise que MySQL/MariaDB esté iniciado, que la base de datos exista "
@@ -602,6 +645,7 @@ public class VentanaClientes extends JFrame {
                 "Error de base de datos", JOptionPane.ERROR_MESSAGE);
     }
 
+    /** Panel con fondo degradado (decorativo). */
     private static class GradientPanel extends JPanel {
         private final Color inicio;
         private final Color fin;
@@ -623,6 +667,7 @@ public class VentanaClientes extends JFrame {
         }
     }
 
+    /** Panel tipo tarjeta con esquinas redondeadas. */
     private static class CardPanel extends JPanel {
         private CardPanel() {
             setOpaque(false);
@@ -644,6 +689,7 @@ public class VentanaClientes extends JFrame {
         }
     }
 
+    /** Etiqueta con fondo redondeado. */
     private static class RoundedBadge extends JPanel {
         private final Color fill;
         private final int arc;
@@ -665,6 +711,7 @@ public class VentanaClientes extends JFrame {
         }
     }
 
+    /** Botón con esquinas redondeadas y cambio de color al pasar el mouse. */
     private static class StyledButton extends JButton {
         private final Color fill;
         private final Color hover;
@@ -705,6 +752,7 @@ public class VentanaClientes extends JFrame {
         }
     }
 
+    /** Define cómo se pintan las celdas del cuerpo de la tabla. */
     private static class BodyRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
@@ -723,6 +771,7 @@ public class VentanaClientes extends JFrame {
         }
     }
 
+    /** Define cómo se pinta el encabezado de la tabla. */
     private static class HeaderRenderer extends DefaultTableCellRenderer {
         private HeaderRenderer() {
             setHorizontalAlignment(LEFT);
