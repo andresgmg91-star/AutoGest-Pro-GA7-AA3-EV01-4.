@@ -6,7 +6,7 @@
 
 ## Qué hace el módulo
 
-Administra los clientes de un taller de mantenimiento vehicular: registrar, consultar, buscar por número de documento, actualizar y eliminar. Se puede usar de tres maneras que comparten el mismo acceso a datos (`ClienteDAO`):
+Este software que esta siendo creando por mi administra los clientes de un taller de mantenimiento vehicular: registrar, consultar, buscar por número de documento, actualizar y eliminar. Se puede usar de tres maneras que comparten el mismo acceso a datos (`ClienteDAO`):
 
 - **Aplicación de escritorio** (Swing): inicio de sesión y ventana de gestión de clientes.
 - **Aplicación web** (Spring Boot + Thymeleaf): login, dashboard y listado/registro de clientes.

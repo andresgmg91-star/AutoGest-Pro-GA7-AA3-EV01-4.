@@ -4,7 +4,7 @@ Proyecto: AutoGest Pro
 Aprendiz: Andrés Mantilla
 
 Enlace del repositorio de GitHub:
-https://github.com/andresgmg91-star/AutoGest-Pro-GA7-AA2-EV01-Copiar
+https://github.com/andresgmg91-star/AutoGest-Pro-GA7-AA3-EV01-4.
 
 El repositorio contiene el código fuente del módulo de gestión de clientes
 (versión de escritorio y versión web con Spring Boot), el script SQL y la documentación.
